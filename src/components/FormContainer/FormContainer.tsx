@@ -1,10 +1,31 @@
 import * as React from "react";
+import axios from "axios";
+import { serverUrl } from "../../helpers/Constants";
 
-interface IFormContainerProps {}
+interface IFormContainerProps {
+  setReloadState: () => void;
+}
 
 export const FormContainer: React.FunctionComponent<IFormContainerProps> = (
   props
 ) => {
+  const [fullUrl, setFullUrl] = React.useState<string>("");
+  const { setReloadState } = props;
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${serverUrl}/shorturl`, {
+        fullUrl,
+      });
+      setFullUrl("");
+      setReloadState();
+    } catch (err) {
+      console.log(err);
+      setFullUrl("");
+      setReloadState();
+
+    }
+  };
   return (
     <div className="container mx-auto p-2">
       <div className="bg-banner my-8 rounded-xl bg-cover text-white bg-center">
@@ -17,7 +38,7 @@ export const FormContainer: React.FunctionComponent<IFormContainerProps> = (
             free tool to shorten a URL or reduce, Use our URL Shortner to create
             shortened and neat link and making it easy to use.
           </p>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex">
               <div className="relative w-full">
                 <div className="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none text-slate-800">
@@ -28,6 +49,10 @@ export const FormContainer: React.FunctionComponent<IFormContainerProps> = (
                   placeholder="Add your link"
                   required
                   className="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500 ps-32"
+                  value={fullUrl}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setFullUrl(e.target.value)
+                  }
                 />
                 <button
                   type="submit"
